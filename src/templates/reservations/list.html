@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Reservas{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="topbar" style="margin-bottom:16px;">
+            <div>
+                <h2 style="margin:0;">Reservas</h2>
+                <p class="muted" style="margin:6px 0 0;">Backoffice base para la prueba técnica.</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Sala</th>
+                <th>Inicio</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.customer.display_name }}</td>
+                    <td>{{ reservation.room.name }}</td>
+                    <td>{{ reservation.starts_at }}</td>
+                    <td><span class="badge">{{ reservation.get_status_display }}</span></td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn" href="{% url 'reservation_detail' reservation.id %}">Ver</a>
+                            {% if perms.reservations.change_reservation %}
+                                <a class="btn" href="{% url 'reservation_edit' reservation.id %}">Editar</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No hay reservas.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

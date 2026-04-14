@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block shell_modifier %}auth-shell{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <h2 style="margin:0 0 6px;">Ingreso al backoffice</h2>
+        <p class="muted" style="margin:0 0 18px;">Usa las credenciales semilla del assessment para explorar el starter.</p>
+        <form method="post" class="stack">
+            {% csrf_token %}
+            <div class="field">
+                <label for="{{ form.username.id_for_label }}">Usuario</label>
+                {{ form.username }}
+            </div>
+            <div class="field">
+                <label for="{{ form.password.id_for_label }}">Contraseña</label>
+                {{ form.password }}
+            </div>
+            {% if form.errors %}
+                <div class="message">Credenciales inválidas.</div>
+            {% endif %}
+            <button class="btn btn-primary" type="submit">Ingresar</button>
+        </form>
+    </div>
+{% endblock %}

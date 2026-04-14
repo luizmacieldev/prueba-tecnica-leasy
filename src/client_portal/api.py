@@ -1,0 +1,86 @@
+from __future__ import annotations
+
+from ninja import NinjaAPI, Router
+from ninja.responses import Status
+
+from client_portal.schemas import (
+    ClientProfileSchema,
+    LoginRequest,
+    ProblemDetailSchema,
+    ReservationListItem,
+    TokenResponse,
+)
+from client_portal.security import ClientJWTAuth, ClientTokenService
+from client_portal.services import ClientPortalAuthService, ClientReservationQueryService
+from shared.errors import AppError
+
+api = NinjaAPI(title="Assessment Client API", version="1.0.0")
+client_auth = ClientJWTAuth()
+
+auth_router = Router(tags=["auth"])
+reservation_router = Router(tags=["reservations"])
+
+FAMILY_HTTP = {
+    "auth": (401, "Authentication Failed"),
+    "domain": (400, "Application Error"),
+}
+
+
+@api.exception_handler(AppError)
+def handle_app_error(request, exc: AppError):
+    status, title = FAMILY_HTTP.get(exc.family, FAMILY_HTTP["domain"])
+    problem = ProblemDetailSchema.make(
+        request=request,
+        status=status,
+        code=exc.code,
+        title=title,
+        detail=exc.detail,
+        errors=exc.errors,
+    )
+    return api.create_response(request, problem.model_dump(), status=status)
+
+
+@auth_router.post(
+    "/login",
+    response={200: TokenResponse, 401: ProblemDetailSchema},
+    auth=None,
+)
+def login(request, payload: LoginRequest):
+    customer = ClientPortalAuthService().authenticate_client(
+        email=payload.email,
+        password=payload.password,
+    )
+    token = ClientTokenService.issue_access_token(customer=customer)
+    return Status(200, TokenResponse(access_token=token))
+
+
+@auth_router.get("/me", response=ClientProfileSchema, auth=client_auth)
+def me(request):
+    customer = request.auth
+    return ClientProfileSchema(
+        id=customer.id,
+        email=customer.user.email,
+        display_name=customer.display_name,
+    )
+
+
+@reservation_router.get("/", response=list[ReservationListItem], auth=client_auth)
+def list_reservations(request):
+    reservations = ClientReservationQueryService().get_customer_reservations(
+        customer_id=request.auth.id
+    )
+    return [
+        ReservationListItem(
+            id=reservation.id,
+            room_name=reservation.room.name,
+            status=reservation.status,
+            starts_at=reservation.starts_at,
+            ends_at=reservation.ends_at,
+            cancel_reason=reservation.cancel_reason or None,
+        )
+        for reservation in reservations
+    ]
+
+
+api.add_router("/auth/", auth_router)
+api.add_router("/reservations/", reservation_router)

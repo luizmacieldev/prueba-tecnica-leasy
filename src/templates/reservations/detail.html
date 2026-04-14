@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de reserva{% endblock %}
+
+{% block content %}
+    <div class="stack">
+        <div class="card">
+            <div class="topbar" style="margin-bottom:16px;">
+                <div>
+                    <h2 style="margin:0;">Detalle de reserva</h2>
+                    <!-- Aquí el candidato agregará el flujo de ON_HOLD.-->
+                </div>
+                <div class="actions">
+                    <a class="btn" href="{% url 'reservation_list' %}">Volver</a>
+                    {% if can_change %}
+                        <a class="btn" href="{% url 'reservation_edit' reservation.id %}">Editar</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <strong>Cliente</strong>
+                    <span>{{ reservation.customer.display_name }}</span>
+                </div>
+                <div class="field">
+                    <strong>Sala</strong>
+                    <span>{{ reservation.room.name }}</span>
+                </div>
+                <div class="field">
+                    <strong>Inicio</strong>
+                    <span>{{ reservation.starts_at }}</span>
+                </div>
+                <div class="field">
+                    <strong>Fin</strong>
+                    <span>{{ reservation.ends_at }}</span>
+                </div>
+                <div class="field">
+                    <strong>Estado</strong>
+                    <span class="badge">{{ reservation.get_status_display }}</span>
+                </div>
+                <div class="field">
+                    <strong>Nota interna</strong>
+                    <span>{{ reservation.internal_note|default:"-" }}</span>
+                </div>
+                <div class="field">
+                    <strong>Motivo de cancelación</strong>
+                    <span>{{ reservation.cancel_reason|default:"-" }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if can_change and reservation.status == "requested" %}
+            <div class="card">
+                <h3 style="margin-top:0;">Acciones rápidas</h3>
+                <form method="post" action="{% url 'reservation_confirm' reservation.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit">Confirmar reserva</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
