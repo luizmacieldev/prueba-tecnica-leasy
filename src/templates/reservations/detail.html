@@ -8,12 +8,17 @@
             <div class="topbar" style="margin-bottom:16px;">
                 <div>
                     <h2 style="margin:0;">Detalle de reserva</h2>
-                    <!-- Aquí el candidato agregará el flujo de ON_HOLD.-->
                 </div>
+
                 <div class="actions">
-                    <a class="btn" href="{% url 'reservation_list' %}">Volver</a>
+                    <a class="btn" href="{% url 'reservation_list' %}">
+                        Volver
+                    </a>
+
                     {% if can_change %}
-                        <a class="btn" href="{% url 'reservation_edit' reservation.id %}">Editar</a>
+                        <a class="btn" href="{% url 'reservation_edit' reservation.id %}">
+                            Editar
+                        </a>
                     {% endif %}
                 </div>
             </div>
@@ -23,40 +28,97 @@
                     <strong>Cliente</strong>
                     <span>{{ reservation.customer.display_name }}</span>
                 </div>
+
                 <div class="field">
                     <strong>Sala</strong>
                     <span>{{ reservation.room.name }}</span>
                 </div>
+
                 <div class="field">
                     <strong>Inicio</strong>
                     <span>{{ reservation.starts_at }}</span>
                 </div>
+
                 <div class="field">
                     <strong>Fin</strong>
                     <span>{{ reservation.ends_at }}</span>
                 </div>
+
                 <div class="field">
                     <strong>Estado</strong>
-                    <span class="badge">{{ reservation.get_status_display }}</span>
+                    <span class="badge">
+                        {{ reservation.get_status_display }}
+                    </span>
                 </div>
+
                 <div class="field">
                     <strong>Nota interna</strong>
                     <span>{{ reservation.internal_note|default:"-" }}</span>
                 </div>
+
                 <div class="field">
                     <strong>Motivo de cancelación</strong>
                     <span>{{ reservation.cancel_reason|default:"-" }}</span>
                 </div>
+
+                <div class="field">
+                    <strong>Motivo de espera</strong>
+                    <span>{{ reservation.hold_reason|default:"-" }}</span>
+                </div>
             </div>
         </div>
 
-        {% if can_change and reservation.status == "requested" %}
+        {% if reservation.status == "requested" %}
             <div class="card">
                 <h3 style="margin-top:0;">Acciones rápidas</h3>
-                <form method="post" action="{% url 'reservation_confirm' reservation.id %}">
-                    {% csrf_token %}
-                    <button class="btn btn-primary" type="submit">Confirmar reserva</button>
-                </form>
+
+                {% if can_change %}
+                    <div style="margin-bottom:24px;">
+                        <strong style="display:block; margin-bottom:12px;">
+                            Confirmar reserva
+                        </strong>
+
+                        <form
+                            method="post"
+                            action="{% url 'reservation_confirm' reservation.id %}"
+                        >
+                            {% csrf_token %}
+
+                            <button class="btn btn-primary" type="submit">
+                                Confirmar
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% if can_hold %}
+                    <div style="border-top:1px solid #e5e5e5; padding-top:20px;">
+                        <strong style="display:block; margin-bottom:12px;">
+                            Colocar reserva en espera
+                        </strong>
+
+                        <form
+                            method="post"
+                            action="{% url 'reservation_hold' reservation.id %}"
+                        >
+                            {% csrf_token %}
+
+                            <div class="field" style="margin-bottom:16px;">
+                                <textarea
+                                    name="hold_reason"
+                                    required
+                                    rows="4"
+                                    style="width:100%;"
+                                    placeholder="Ingrese el motivo de espera"
+                                ></textarea>
+                            </div>
+
+                            <button class="btn" type="submit">
+                                Colocar en espera
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     </div>
