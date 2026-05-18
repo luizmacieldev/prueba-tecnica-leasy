@@ -7,10 +7,14 @@ from django.db import transaction
 from reservations.constants import (
     RESERVATION_STATUS_CONFIRMED,
     RESERVATION_STATUS_REQUESTED,
+    RESERVATION_STATUS_ON_HOLD,
 )
+
 from reservations.exceptions import (
     ReservationNotFoundError,
     ReservationStatusTransitionError,
+    ReservationHoldReasonRequiredError,
+    ReservationPermissionDeniedError,
 )
 from reservations.models import Reservation
 
@@ -76,4 +80,43 @@ class ReservationLifecycleService:
 
         reservation.status = RESERVATION_STATUS_CONFIRMED
         reservation.save(update_fields=["status", "updated_at"])
+        return reservation
+
+    @transaction.atomic
+    def hold_reservation(
+        self,
+        *,
+        reservation_id: UUID,
+        hold_reason: str,
+        actor,
+    ) -> Reservation:
+        try:
+            reservation = (
+                Reservation.objects.select_for_update()
+                .select_related("customer__user", "room")
+                .get(pk=reservation_id)
+            )
+        except Reservation.DoesNotExist as exc:
+            raise ReservationNotFoundError() from exc
+
+        if not actor.has_perm("reservations.hold_reservation"):
+            raise ReservationPermissionDeniedError()
+
+        if not hold_reason or not hold_reason.strip():
+            raise ReservationHoldReasonRequiredError()
+
+        if reservation.status != RESERVATION_STATUS_REQUESTED:
+            raise ReservationStatusTransitionError()
+
+        reservation.status = RESERVATION_STATUS_ON_HOLD
+        reservation.hold_reason = hold_reason
+
+        reservation.save(
+            update_fields=[
+                "status",
+                "hold_reason",
+                "updated_at",
+            ]
+        )
+
         return reservation
