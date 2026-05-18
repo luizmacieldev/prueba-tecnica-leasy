@@ -6,6 +6,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
+from reservations.exceptions import ReservationHoldReasonRequiredError
 from reservations.forms import ReservationUpdateForm
 from reservations.models import Reservation
 from reservations.services import ReservationLifecycleService, ReservationUpdateService
@@ -91,4 +92,52 @@ class ReservationConfirmView(
             actor_id=request.user.id,
         )
         messages.success(request, "Reserva confirmada.")
+        return redirect("reservation_detail", pk=pk)
+
+
+class ReservationDetailView(
+    LoginRequiredMixin, AuthenticatedPermissionRequiredMixin, View
+):
+    permission_required = "reservations.view_reservation"
+
+    def get(self, request: HttpRequest, pk) -> HttpResponse:
+        reservation = get_object_or_404(
+            Reservation.objects.select_related("customer__user", "room"),
+            pk=pk,
+        )
+
+        return render(
+            request,
+            "reservations/detail.html",
+            {
+                "reservation": reservation,
+                "can_change": request.user.has_perm(
+                    "reservations.change_reservation"
+                ),
+                "can_hold": request.user.has_perm(
+                    "reservations.hold_reservation"
+                ),
+            },
+        )
+    
+class ReservationHoldView(
+    LoginRequiredMixin, AuthenticatedPermissionRequiredMixin, View
+):
+    permission_required = "reservations.hold_reservation"
+
+    def post(self, request: HttpRequest, pk) -> HttpResponse:
+        hold_reason = request.POST.get("hold_reason", "")
+
+        try:
+            ReservationLifecycleService().hold_reservation(
+                reservation_id=pk,
+                hold_reason=hold_reason,
+                actor=request.user,
+            )
+
+            messages.success(request, "Reserva colocada en espera.")
+
+        except ReservationHoldReasonRequiredError:
+            messages.error(request, "El motivo es obligatorio.")
+
         return redirect("reservation_detail", pk=pk)
