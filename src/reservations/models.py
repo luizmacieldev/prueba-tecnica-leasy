@@ -53,6 +53,7 @@ class Reservation(models.Model):
     )
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
+    hold_reason = models.TextField(blank=True)
     internal_note = models.TextField(blank=True)
     cancel_reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
