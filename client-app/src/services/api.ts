@@ -22,7 +22,7 @@ export async function login(
 
   if (!response.ok) {
     throw new Error(
-      data.detail || "Login failed"
+      data.detail || "Error al iniciar sesión"
     )
   }
 
@@ -46,7 +46,7 @@ export async function getReservations(
   if (!response.ok) {
     throw new Error(
       data.detail ||
-      "Failed to load reservations"
+      "Error al cargar reservas"
     )
   }
 
@@ -77,7 +77,7 @@ export async function cancelReservation(
   if (!response.ok) {
     throw new Error(
       data.detail ||
-      "Failed to cancel reservation"
+      "Error al cancelar la reserva"
     )
   }
 
