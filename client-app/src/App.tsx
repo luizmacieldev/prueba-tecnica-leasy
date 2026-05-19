@@ -1,4 +1,8 @@
-import { FormEvent, useState } from "react"
+import {
+  FormEvent,
+  useEffect,
+  useState,
+} from "react"
 
 import {
   cancelReservation,
@@ -13,19 +17,49 @@ import type {
 function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [token, setToken] = useState("")
+
+  const [token, setToken] = useState(
+    localStorage.getItem("token") || "",
+  )
 
   const [reservations, setReservations] =
     useState<Reservation[]>([])
 
   const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+
+  const [successMessage, setSuccessMessage] =
+    useState("")
+
+  const [loading, setLoading] =
+    useState(false)
 
   const [cancelReason, setCancelReason] =
     useState("")
 
   const [selectedReservationId, setSelectedReservationId] =
     useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadReservations() {
+      try {
+        if (!token) {
+          return
+        }
+
+        const reservationsData =
+          await getReservations(token)
+
+        setReservations(reservationsData)
+
+      } catch (err) {
+        console.error(err)
+
+        handleLogout()
+      }
+    }
+
+    loadReservations()
+  }, [token])
 
   async function handleLogin(
     event: FormEvent,
@@ -34,7 +68,9 @@ function App() {
 
     try {
       setLoading(true)
+
       setError("")
+      setSuccessMessage("")
 
       const response = await login(
         email,
@@ -42,6 +78,11 @@ function App() {
       )
 
       setToken(response.access_token)
+
+      localStorage.setItem(
+        "token",
+        response.access_token,
+      )
 
       const reservationsData =
         await getReservations(
@@ -51,10 +92,12 @@ function App() {
       setReservations(reservationsData)
 
     } catch (err) {
+      setSuccessMessage("")
+
       setError(
         err instanceof Error
           ? err.message
-          : "Unexpected error",
+          : "Ocurrió un error inesperado.",
       )
 
     } finally {
@@ -84,15 +127,33 @@ function App() {
       )
 
       setSelectedReservationId(null)
+
       setCancelReason("")
 
+      setSuccessMessage(
+        "Reserva cancelada con éxito.",
+      )
+
     } catch (err) {
+      setSuccessMessage("")
+
       setError(
         err instanceof Error
           ? err.message
-          : "Unexpected error",
+          : "Ocurrió un error inesperado.",
       )
     }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("token")
+
+    setToken("")
+    setReservations([])
+    setEmail("")
+    setPassword("")
+    setError("")
+    setSuccessMessage("")
   }
 
   return (
@@ -100,12 +161,18 @@ function App() {
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
 
         <h1 className="text-3xl font-bold mb-8">
-          Client Portal
+          Portal del Cliente
         </h1>
 
         {error && (
           <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-6">
             {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-6">
+            {successMessage}
           </div>
         )}
 
@@ -116,7 +183,7 @@ function App() {
           >
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Correo electrónico"
               value={email}
               onChange={(event) =>
                 setEmail(event.target.value)
@@ -126,7 +193,7 @@ function App() {
 
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Contraseña"
               value={password}
               onChange={(event) =>
                 setPassword(event.target.value)
@@ -140,8 +207,8 @@ function App() {
               className="bg-black text-white rounded-lg p-3"
             >
               {loading
-                ? "Loading..."
-                : "Login"}
+                ? "Cargando..."
+                : "Iniciar sesión"}
             </button>
           </form>
         )}
@@ -149,8 +216,17 @@ function App() {
         {token && (
           <div>
             <h2 className="text-2xl font-semibold mb-6">
-              My Reservations
+              Mis reservas
             </h2>
+
+            <div className="mb-6">
+              <button
+                onClick={handleLogout}
+                className="border px-4 py-2 rounded-lg"
+              >
+                Cerrar sesión
+              </button>
+            </div>
 
             <div className="space-y-4">
               {reservations.map(
@@ -160,24 +236,24 @@ function App() {
                     className="border rounded-xl p-5"
                   >
                     <p>
-                      <strong>Room:</strong>{" "}
+                      <strong>Sala:</strong>{" "}
                       {reservation.room_name}
                     </p>
 
                     <p>
-                      <strong>Status:</strong>{" "}
+                      <strong>Estado:</strong>{" "}
                       {reservation.status}
                     </p>
 
                     <p>
-                      <strong>Starts:</strong>{" "}
+                      <strong>Inicio:</strong>{" "}
                       {new Date(
-                      reservation.starts_at,
-                    ).toLocaleString()}
+                        reservation.starts_at,
+                      ).toLocaleString()}
                     </p>
 
                     <p>
-                      <strong>Ends:</strong>{" "}
+                      <strong>Fin:</strong>{" "}
                       {new Date(
                         reservation.ends_at,
                       ).toLocaleString()}
@@ -186,7 +262,7 @@ function App() {
                     {reservation.cancel_reason && (
                       <p>
                         <strong>
-                          Cancel reason:
+                          Motivo de cancelación:
                         </strong>{" "}
                         {
                           reservation.cancel_reason
@@ -194,7 +270,10 @@ function App() {
                       </p>
                     )}
 
-                    {["requested", "confirmed"].includes(
+                    {[
+                      "requested",
+                      "confirmed",
+                    ].includes(
                       reservation.status,
                     ) && (
                       <div className="mt-4">
@@ -202,7 +281,7 @@ function App() {
                         reservation.id ? (
                           <div className="flex flex-col gap-3">
                             <textarea
-                              placeholder="Cancellation reason"
+                              placeholder="Motivo de cancelación"
                               value={cancelReason}
                               onChange={(event) =>
                                 setCancelReason(
@@ -221,7 +300,7 @@ function App() {
                                 }
                                 className="bg-red-600 text-white px-4 py-2 rounded-lg"
                               >
-                                Confirm cancellation
+                                Confirmar cancelación
                               </button>
 
                               <button
@@ -234,7 +313,7 @@ function App() {
                                 }}
                                 className="border px-4 py-2 rounded-lg"
                               >
-                                Cancel
+                                Cancelar
                               </button>
                             </div>
                           </div>
@@ -247,7 +326,7 @@ function App() {
                             }
                             className="bg-black text-white px-4 py-2 rounded-lg mt-3"
                           >
-                            Cancel reservation
+                            Cancelar reserva
                           </button>
                         )}
                       </div>
