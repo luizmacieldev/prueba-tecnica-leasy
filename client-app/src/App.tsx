@@ -247,16 +247,20 @@ function App() {
 
                     <p>
                       <strong>Inicio:</strong>{" "}
-                      {new Date(
+                       {new Date(
                         reservation.starts_at,
-                      ).toLocaleString()}
+                      ).toLocaleString("es-PE", {
+                        timeZone: "America/Lima",
+                      })}
                     </p>
 
                     <p>
                       <strong>Fin:</strong>{" "}
                       {new Date(
                         reservation.ends_at,
-                      ).toLocaleString()}
+                      ).toLocaleString("es-PE", {
+                        timeZone: "America/Lima",
+                      })}
                     </p>
 
                     {reservation.cancel_reason && (
