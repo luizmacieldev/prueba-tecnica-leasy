@@ -137,6 +137,20 @@ password: demo1234
 - Visualización del perfil del cliente
 
 ---
+## API Testing
+
+A Postman collection is available in:
+
+```text
+postman/test_api_enpoints.postman_collection.json
+```
+
+The collection includes:
+
+- Login requests
+- Reservation listing requests
+- Reservation cancellation requests
+- Error validation scenarios
 
 ## Docker
 
