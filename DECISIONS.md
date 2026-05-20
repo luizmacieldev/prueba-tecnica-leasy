@@ -14,7 +14,7 @@ Se validan:
 
 ## 2. Persistencia de sesión en frontend
 
-Decidí persistir el token JWT usando localStorage para mantener la sesión activa después de refrescar la página.
+Decidí persistir el token JWT usando localStorage para mantener la sesión activa después de actualiza la página.
 
 ---
 
