@@ -1,23 +1,34 @@
+# Python
 .venv
-__pycache__
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-.pytest_cache
-.mypy_cache
 
-node_modules
-dist
+# Pytest
+.pytest_cache/
 
+# VSCode
+.vscode/
+
+# Git
 .git
 .gitignore
 
-.vscode
-.idea
+# Environment files
+.env
 
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+client-app/node_modules
+client-app/dist
+
+# Database
 db.sqlite3
 src/db.sqlite3
 
-client-app/node_modules
-client-app/dist
+# Docker
+docker-compose.override.yml
