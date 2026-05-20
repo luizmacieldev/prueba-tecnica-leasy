@@ -1,83 +1,158 @@
-# Prueba técnica full stack: backoffice + API cliente
+# Full Stack Assessment
 
-Starter repo para evaluar criterio full stack con foco principal en Django.
+Este proyecto contiene una aplicación full stack para la gestión de reservas utilizando:
 
-## Stack
+- Django
+- Django Ninja
+- React
+- TypeScript
+- Docker
+- Docker Compose
 
-- Django 5.2
-- Django templates para backoffice
-- Django Ninja para API cliente
-- Pydantic v2 para contratos y errores del API
-- pytest + factory_boy
+---
 
-## Dominio
+# Requisitos
 
-El dominio es ficticio y está basado en reservas:
+Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
-- `Customer`
-- `Room`
-- `Reservation`
+- Docker
+- Git
+- Python
 
-## Flujo de la prueba
 
-El assessment tiene dos partes:
+---
 
-1. Extender el backoffice Django con una transición nueva de reservas.
-2. Construir una mini app cliente en `client-app/` para consumir el API.
-3. Dockerizar la solución completa.
+# Clonar el repositorio
 
-La consigna completa está en [ASSESSMENT.md](./ASSESSMENT.md).
-El contrato base del API está en [API_CONTRACT.md](./API_CONTRACT.md).
+```bash
+git clone <tu-repositorio>
+```
+
+---
+
+# Entrar en la carpeta del proyecto
+
+```bash
+cd prueba-tecnica-leasy
+```
+
+---
+
+# Ejecutar la aplicación
+
+Construir e iniciar todos los servicios:
+
+```bash
+docker compose up --build
+```
+
+---
+
+# URLs de la aplicación
+
+## Frontend
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Backend
+
+```text
+http://localhost:8000
+```
+
+---
+
+## Documentación de la API
+
+```text
+http://localhost:8000/api/docs
+```
+
+---
+
+## Django Back Office
+
+```text
+http://localhost:8000/
+```
+
+---
+
+# Credenciales de demostración
+
+## Usuario administrador
+
+```text
+username: manager
+password: demo1234
+```
+
+---
+
+## Usuario cliente
+
+```text
+email: alice@example.com
+password: demo1234
+```
+
+---
+
+# Funcionalidades
+
+## Backend
+
+- API con Django Ninja
+- Autenticación JWT
+- Endpoint para listar reservas
+- Endpoint para cancelar reservas
+- Respuestas de error estables
+- Arquitectura basada en capa de servicios
+- Validaciones de dominio
+- Validación de propiedad de reservas
+- Validación de estados permitidos
+
+---
+
+## Frontend
+
+- React + TypeScript
+- Inicio de sesión
+- Lista de reservas
+- Flujo de cancelación de reservas
+- Manejo de errores de la API
+- Mensajes de éxito
+- Persistencia de sesión
+- Logout
+- Visualización del perfil del cliente
+
+---
 
 ## Docker
 
-El starter **no incluye Dockerfile ni docker-compose** a propósito.
+- Backend dockerizado
+- Frontend dockerizado
+- Gunicorn como servidor WSGI
+- Nginx para servir el frontend
+- Docker Compose para orquestación
+- WhiteNoise para archivos estáticos
 
-Eso forma parte de la prueba. El candidato debe:
+---
 
-- dockerizar el backend Django
-- dockerizar la mini app cliente
-- agregar un `docker-compose.yml`
-- documentar cómo correr todo con Docker
-
-La expectativa es un Dockerfile orientado a producción y no una imagen mínima
-hecha solo para pasar localmente.
-
-## Setup
+# Detener la aplicación
 
 ```bash
-uv sync
-uv run python src/manage.py migrate
-uv run python src/manage.py seed_assessment_data
-uv run python src/manage.py runserver
+docker compose down
 ```
 
-## URLs útiles
+---
 
-- Backoffice login: [http://127.0.0.1:8000/accounts/login/](http://127.0.0.1:8000/accounts/login/)
-- Backoffice reservas: [http://127.0.0.1:8000/backoffice/reservations/](http://127.0.0.1:8000/backoffice/reservations/)
-- API base: [http://127.0.0.1:8000/api/v1/](http://127.0.0.1:8000/api/v1/)
+# Notas
 
-## Checks mínimos
-
-```bash
-PYTHONPATH=src uv run pytest
-uv run ruff check .
-```
-
-## Credenciales semilla
-
-Se crean con `seed_assessment_data`:
-
-- Staff manager
-  - username: `manager`
-  - password: `demo1234`
-- Staff operator
-  - username: `operator`
-  - password: `demo1234`
-- Cliente Alice
-  - email: `alice@example.com`
-  - password: `demo1234`
-- Cliente Bob
-  - email: `bob@example.com`
-  - password: `demo1234`
+- El proyecto utiliza SQLite para simplificar la ejecución.
+- Los datos demo se crean automáticamente al iniciar los contenedores.
+- Los archivos estáticos son servidos utilizando WhiteNoise.
