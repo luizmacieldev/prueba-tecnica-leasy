@@ -143,8 +143,6 @@ La colección de Postman está disponible en:
 
 postman/test_api_enpoints.postman_collection.json
 
-The collection includes:
-
 - Requests de login
 - Requests para listar reservas
 - Requests para cancelación de reservas
