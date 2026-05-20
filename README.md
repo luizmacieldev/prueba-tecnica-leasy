@@ -25,7 +25,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 # Clonar el repositorio
 
 ```bash
-git clone <tu-repositorio>
+git clone https://github.com/luizmacieldev/prueba-tecnica-leasy
 ```
 
 ---
@@ -58,10 +58,10 @@ http://localhost:5173
 
 ---
 
-## Backend
+## Django Back Office
 
 ```text
-http://localhost:8000
+http://localhost:8000/
 ```
 
 ---
@@ -74,11 +74,6 @@ http://localhost:8000/api/docs
 
 ---
 
-## Django Back Office
-
-```text
-http://localhost:8000/
-```
 
 ---
 
@@ -91,15 +86,26 @@ username: manager
 password: demo1234
 ```
 
+## Usuario operador
+
+```text
+username: operator
+password: demo1234
+```
+
 ---
 
-## Usuario cliente
+## Usuarios clientes
 
 ```text
 email: alice@example.com
 password: demo1234
 ```
 
+```text
+email: bob@example.com
+password: demo1234
+```
 ---
 
 # Funcionalidades
