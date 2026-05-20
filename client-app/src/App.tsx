@@ -7,16 +7,19 @@ import {
 import {
   cancelReservation,
   getReservations,
+  getProfile,
   login,
 } from "./services/api"
 
 import type {
+  ClientProfile,
   Reservation,
 } from "./types/api"
 
 function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [profile, setProfile] = useState<ClientProfile | null>(null)
 
   const [token, setToken] = useState(
     localStorage.getItem("token") || "",
@@ -39,27 +42,32 @@ function App() {
   const [selectedReservationId, setSelectedReservationId] =
     useState<string | null>(null)
 
-  useEffect(() => {
-    async function loadReservations() {
-      try {
-        if (!token) {
-          return
-        }
-
-        const reservationsData =
-          await getReservations(token)
-
-        setReservations(reservationsData)
-
-      } catch (err) {
-        console.error(err)
-
-        handleLogout()
+useEffect(() => {
+  async function loadReservations() {
+    try {
+      if (!token) {
+        return
       }
-    }
 
-    loadReservations()
-  }, [token])
+      const reservationsData =
+        await getReservations(token)
+
+      setReservations(reservationsData)
+
+      const profileData =
+        await getProfile(token)
+
+      setProfile(profileData)
+
+    } catch (err) {
+      console.error(err)
+
+      handleLogout()
+    }
+  }
+
+  loadReservations()
+}, [token])
 
   async function handleLogin(
     event: FormEvent,
@@ -159,11 +167,18 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
+                  {profile && (
+          <p className="text-gray-500 mt-1">
+            Hola, {profile.display_name}
+          </p>
+          )}
 
         <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">
           Portal del Cliente
         </h1>
+
+
 
         {token && (
           <button

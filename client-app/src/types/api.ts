@@ -21,3 +21,9 @@ export type ProblemDetail = {
   instance: string
   errors: unknown[] | null
 }
+
+export type ClientProfile = {
+  id: string
+  email: string
+  display_name: string
+}

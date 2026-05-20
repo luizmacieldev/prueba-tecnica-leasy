@@ -83,3 +83,24 @@ export async function cancelReservation(
 
   return data
 }
+
+export async function getProfile(
+  token: string,
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/auth/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      "Error al cargar el perfil.",
+    )
+  }
+
+  return response.json()
+}
