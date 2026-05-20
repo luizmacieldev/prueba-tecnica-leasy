@@ -160,9 +160,21 @@ function App() {
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
 
-        <h1 className="text-3xl font-bold mb-8">
+        <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">
           Portal del Cliente
         </h1>
+
+        {token && (
+          <button
+            onClick={handleLogout}
+            className="border px-4 py-2 rounded-lg"
+          >
+            Cerrar sesión
+          </button>
+        )}
+</div>
+        
 
         {error && (
           <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-6">
@@ -219,14 +231,6 @@ function App() {
               Mis reservas
             </h2>
 
-            <div className="mb-6">
-              <button
-                onClick={handleLogout}
-                className="border px-4 py-2 rounded-lg"
-              >
-                Cerrar sesión
-              </button>
-            </div>
 
             <div className="space-y-4">
               {reservations.map(
