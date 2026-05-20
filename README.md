@@ -21,6 +21,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
 
 ---
+## Siga los siguientes pasos para ejecutar el proyecto
 
 # Clonar el repositorio
 
@@ -69,7 +70,7 @@ http://localhost:8000/
 ## Documentación de la API
 
 ```text
-http://localhost:8000/api/docs
+http://localhost:8000/api/v1/docs 
 ```
 
 ---
@@ -118,7 +119,6 @@ password: demo1234
 - Endpoint para cancelar reservas
 - Respuestas de error estables
 - Arquitectura basada en capa de servicios
-- Validaciones de dominio
 - Validación de propiedad de reservas
 - Validación de estados permitidos
 
@@ -137,20 +137,18 @@ password: demo1234
 - Visualización del perfil del cliente
 
 ---
-## API Testing
+## Testing de API
 
-A Postman collection is available in:
+La colección de Postman está disponible en:
 
-```text
 postman/test_api_enpoints.postman_collection.json
-```
 
 The collection includes:
 
-- Login requests
-- Reservation listing requests
-- Reservation cancellation requests
-- Error validation scenarios
+- Requests de login
+- Requests para listar reservas
+- Requests para cancelación de reservas
+- Escenarios de validación de errores
 
 ## Docker
 
