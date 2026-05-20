@@ -1,9 +1,12 @@
 import {
-  FormEvent,
   useEffect,
   useState,
 } from "react"
 
+import type {
+  FormEvent,
+} from "react"
+;
 import {
   cancelReservation,
   getReservations,
@@ -15,6 +18,8 @@ import type {
   ClientProfile,
   Reservation,
 } from "./types/api"
+
+
 
 function App() {
   const [email, setEmail] = useState("")
