@@ -76,8 +76,6 @@ http://localhost:8000/api/v1/docs
 ---
 
 
----
-
 # Credenciales de demostración
 
 ## Usuario administrador
@@ -172,3 +170,6 @@ docker compose down
 - El proyecto utiliza SQLite para simplificar la ejecución.
 - Los datos demo se crean automáticamente al iniciar los contenedores.
 - Los archivos estáticos son servidos utilizando WhiteNoise.
+
+# Decisiones tomadas para el proyecto
+ - https://github.com/luizmacieldev/prueba-tecnica-leasy/blob/main/DECISIONS.md
